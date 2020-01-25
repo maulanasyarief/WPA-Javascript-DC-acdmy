@@ -1,0 +1,13 @@
+// setiap kali subscrib / 
+reload pastikan hasil endpoint nya sama
+jika beda copi hasil subscrib nya yng ada di console
+
+Berhasil melakukan subscribe dengan endpoint: 
+ https://fcm.googleapis.com/fcm/send/dw5cYPRVdFw:APA91bESoqyTrqiYCnl8vIfqzLDaGz_oJ1Ks2DsJcZX-v3HmYUsSsAe8tZxCXUQ89S1cA8-awWzmewYXw10EZoPQTixddQcK_Jk4cl0HfCg6KSOt-MuGCMAb-KIS6gcHEYkJOd0BfITK
+
+(index):108 Berhasil melakukan subscribe dengan 
+p256dh key:  BOJs5ziTCN6FxH0pCTV7CDCf+fHJ8e6h0GdAo6IBcDSa3bjja2e4NvgINAvDVPeT4l5T8/AmrOKt+p4RtLYOr6c=
+
+(index):112 Berhasil melakukan subscribe dengan 
+auth key:  20giY/R3AScc9gh//UWb0A==
+(index):57 Pendaftaran ServiceWorker berhasil

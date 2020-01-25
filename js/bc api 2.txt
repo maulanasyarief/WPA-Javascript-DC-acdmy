@@ -1,0 +1,791 @@
+var token = {
+  headers: {
+    'X-Auth-Token': '6434dbc29f2a4d51888aea3a68e33431'
+  }
+};
+var base_url = "http://api.football-data.org/v2/";
+var comp = "competitions";
+var fltr_comp = "?plan=TIER_ONE"
+var fl_teams = "teams/";
+var fl_macth = "matches/";
+//var base_url = "http://api.football-data.org/v2/competitions/2021/"; // team url  /teams PL Inggris
+
+// Blok kode yang akan di panggil jika fetch berhasil
+function status(response) {
+  if (response.status !== 200) {
+    console.log("Error : " + response.status);
+    // Method reject() akan membuat blok catch terpanggil
+    return Promise.reject(new Error(response.statusText));
+  } else {
+    // Mengubah suatu objek menjadi Promise agar bisa "di-then-kan"
+    return Promise.resolve(response);
+  }
+}
+
+// Blok kode untuk memparsing json menjadi array JavaScript
+function json(response) {
+  return response.json();
+}
+// Blok kode untuk meng-handle kesalahan di blok catch
+function error(error) {
+  // Parameter error berasal dari Promise.reject()
+  console.log("Error : " + error);
+}
+
+
+function getAllTeams() {
+  // jika tersimpan di chace
+  if ('caches' in window) {
+    caches.match(base_url + fl_teams).then(function (response) {
+      if (response) {
+        response.json().then(function (data) {
+          var temasHTML = "";
+          data.teams.forEach(function (array_data) {
+            //  if (array_data.crestUrl != null) {
+            if (array_data.crestUrl == null) {
+              array_data.crestUrl = "./images/img_null.jpg";
+            }
+            temasHTML += `
+                          <div class="col s12 m4">
+                          <div class="card small">
+                            <div class="card-image">
+                                <a href="./teams.html?id=${array_data.id}">                            
+                                    <img class="responsive-img" src="${array_data.crestUrl}" >                          
+                                </a>
+                            </div>
+                            <div class="card-content center-align">
+                            <h5 class="blue-text">${array_data.name}</h5>
+                            </div>
+                          </div>
+                        </div>`;
+
+          });
+          // Sisipkan komponen card ke dalam elemen dengan id #teams
+          document.getElementById("teams").innerHTML = temasHTML;
+        })
+      }
+    })
+  }
+
+  fetch(base_url + fl_teams, token)
+    .then(status)
+    .then(json)
+    .then(function (data) {
+      console.log(data);
+      // Objek/array JavaScript dari response.json() masuk lewat data.
+      var temasHTML = "";
+      data.teams.forEach(function (array_data) {
+        // if (array_data.crestUrl != null) {
+        if (array_data.crestUrl == null) {
+          array_data.crestUrl = "./images/img_null.jpg";
+        }
+        temasHTML += `
+                 <div class="col s12 m4">
+                  <div class="card small">
+                    <div class="card-image">
+                        <a href="./teams.html?id=${array_data.id}">                            
+                            <img class="responsive-img" style="padding:10px;" src="${array_data.crestUrl}" >                          
+                        </a>
+                    </div>
+                    <div class="card-content center-align">
+                    <h5 class="blue-text">${array_data.name}</h5>
+                    </div>
+                  </div>
+                </div>`;
+
+      });
+      // Sisipkan komponen card ke dalam elemen dengan id #content
+      document.getElementById("teams").innerHTML = temasHTML;
+    })
+    .catch(error);
+}
+
+function getTeamsById() {
+  return new Promise(function (resolve, reject) {
+    // Ambil nilai query parameter (?id=)
+    var urlParams = new URLSearchParams(window.location.search);
+    var idParam = urlParams.get("id");
+    if ("caches" in window) {
+      caches.match(base_url + fl_teams + idParam, token).then(function (response) {
+        if (response) {
+          response.json().then(function (data) {
+            var datatabel_comp = "";
+            var datatabel_play = "";
+            var no_play = 1;
+            var no_comp = 1;
+            if (data.crestUrl === null) {
+              data.crestUrl = "./images/img_null.jpg";
+            }
+            var articleHTML = `      
+                                <div class="card-image waves-effect waves-block waves-light">
+                                  <img class="responsive-img" style="padding:10px;" src="${data.crestUrl}" />
+                                </div>
+                                <div class="card-content">
+                                <h4> <i class="Medium material-icons">flag</i>${data.name}</h4>
+                                    <table >
+                                        <thead>
+                                            <tr>
+                                                <th>Info</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>Club Name</td>
+                                                <td>${data.name}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Club Color</td>
+                                                <td>${data.clubColors}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Venue </td>
+                                                <td>${data.venue}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Founded</td>
+                                                <td>${data.founded}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Address</td>
+                                                <td>${data.address}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Phone</td>
+                                                <td>${data.phone}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Website</td>
+                                                <td>${data.website}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Email</td>
+                                                <td>${data.email}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>`;
+            // data compotitions
+            data.activeCompetitions.forEach(function (data_comp) {
+              datatabel_comp += `
+                <tr>
+                    <td>${no_comp++}</td>
+                    <td>${data_comp.name}</td>
+                    <td>${data_comp.code}</td>
+                    <td>${data_comp.plan}</td>
+                </tr>`;
+
+            });
+            //data player squad
+            data.squad.forEach(function (data_squad) {
+              datatabel_play += `
+                <tr>
+                    <td>${no_play++}</td>
+                    <td>${data_squad.name}</td>
+                    <td>${data_squad.position}</td>
+                </tr>`;
+
+            });
+
+            document.getElementById("body-content").innerHTML = articleHTML;
+            document.getElementById("tabel-comp").innerHTML = datatabel_comp;
+            document.getElementById("tabel-player").innerHTML = datatabel_play;
+            // Kirim objek data hasil parsing json agar bisa disimpan ke indexed db
+            resolve(data);
+          });
+        }
+      });
+    }
+    // in online request
+    fetch(base_url + fl_teams + idParam, token)
+      .then(status)
+      .then(json)
+      .then(function (data) {
+        // Objek JavaScript dari response.json() masuk lewat variabel data.
+        console.log(data);
+        var datatabel_comp = "";
+        var datatabel_play = "";
+        var no_play = 1;
+        var no_comp = 1;
+        if (data.crestUrl === null) {
+          data.crestUrl = "./images/img_null.jpg";
+        }
+        var articleHTML = `      
+                            <div class="card-image waves-effect waves-block waves-light">
+                              <img class="responsive-img" style="padding:10px;" src="${data.crestUrl}" />
+                            </div>
+                            <div class="card-content">
+                            <h4> <i class="Medium material-icons">flag</i>${data.name}</h4>
+                                <table >
+                                    <thead>
+                                        <tr>
+                                            <th>Info</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Club Name</td>
+                                            <td>${data.name}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Club Color</td>
+                                            <td>${data.clubColors}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Venue </td>
+                                            <td>${data.venue}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Founded</td>
+                                            <td>${data.founded}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Address</td>
+                                            <td>${data.address}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Phone</td>
+                                            <td>${data.phone}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Website</td>
+                                            <td>${data.website}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Email</td>
+                                            <td>${data.email}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>`;
+        // data compotitions
+        data.activeCompetitions.forEach(function (data_comp) {
+          datatabel_comp += `
+            <tr>
+                <td>${no_comp++}</td>
+                <td>${data_comp.name}</td>
+                <td>${data_comp.code}</td>
+                <td>${data_comp.plan}</td>
+            </tr>`;
+
+        });
+        //data player squad
+        data.squad.forEach(function (data_squad) {
+          datatabel_play += `
+            <tr>
+                <td>${no_play++}</td>
+                <td>${data_squad.name}</td>
+                <td>${data_squad.position}</td>
+            </tr>`;
+
+        });
+
+        document.getElementById("body-content").innerHTML = articleHTML;
+        document.getElementById("tabel-comp").innerHTML = datatabel_comp;
+        document.getElementById("tabel-player").innerHTML = datatabel_play;
+        // Kirim objek data hasil parsing json agar bisa disimpan ke indexed db
+        resolve(data);
+      });
+  });
+}
+
+// ============================= read match =================================================
+function getAllMatch() {
+  // jika tersimpan di chace
+  if ('caches' in window) {
+    caches.match(base_url + fl_macth).then(function (response) {
+      if (response) {
+        response.json().then(function (data) {
+          var macthHTML = "";
+          var img_liga = "";
+          data.matches.forEach(function (array_data) {
+            if (array_data.competition.name === "Primera Division") {
+              img_liga = "/images/PD.png";
+            } else if (array_data.competition.name === "Eredivisie") {
+              img_liga = "/images/ED.jpg";
+            } else if (array_data.competition.name === "Serie A") {
+              img_liga = "/images/SA.png";
+            } else if (array_data.competition.name === "Championship") {
+              img_liga = "/images/CS.png";
+            } else if (array_data.competition.name === "Premier League") {
+              img_liga = "/images/PL.png";
+            } else if (array_data.competition.name === "Bundesliga") {
+              img_liga = "/images/BL.png";
+            }
+            macthHTML += `
+                  <div class="col s12 m4">
+                  <div class="card small">
+                    <div class="card-image">
+                    <a href="./match.html?id=${array_data.id}">                            
+                            <img class="responsive-img" style="padding:10px;" src="${img_liga}" >                          
+                        </a>
+                    </div>
+                    <div class="card-content center-align">
+                    <h5 class="blue-text">${array_data.competition.name}</h5>
+                    </div>
+                  </div>
+                </div>`;
+          });
+          // Sisipkan komponen card ke dalam elemen dengan id #teams
+          document.getElementById("macth").innerHTML = macthHTML;
+        })
+      }
+    })
+  }
+
+  fetch(base_url + fl_macth, token)
+    .then(status)
+    .then(json)
+    .then(function (data) {
+      console.log(data);
+      // Objek/array JavaScript dari response.json() masuk lewat data.
+      var macthHTML = "";
+      var img_liga = "";
+      data.matches.forEach(function (array_data) {
+        if (array_data.competition.name === "Primera Division") {
+          img_liga = "/images/PD.png";
+        } else if (array_data.competition.name === "Eredivisie") {
+          img_liga = "/images/ED.jpg";
+        } else if (array_data.competition.name === "Serie A") {
+          img_liga = "/images/SA.png";
+        } else if (array_data.competition.name === "Championship") {
+          img_liga = "/images/CS.png";
+        } else if (array_data.competition.name === "Premier League") {
+          img_liga = "/images/PL.png";
+        } else if (array_data.competition.name === "Bundesliga") {
+          img_liga = "/images/BL.png";
+        }
+
+        macthHTML += `
+              <div class="col s12 m4">
+              <div class="card small">
+                <div class="card-image">
+                    <a href="./match.html?id=${array_data.id}">                            
+                        <img class="responsive-img" src="${img_liga}" >                          
+                    </a>
+                </div>
+                <div class="card-content center-align">
+                <h5 class="blue-text">${array_data.competition.name}</h5>
+                </div>
+              </div>
+            </div>`;
+
+      });
+      // Sisipkan komponen card ke dalam elemen dengan id #content
+      document.getElementById("macth").innerHTML = macthHTML;
+
+    })
+    .catch(error);
+}
+
+function getMatchById() {
+  return new Promise(function (resolve, reject) {
+    // Ambil nilai query parameter (?id=)
+    var urlParams = new URLSearchParams(window.location.search);
+    var idParam = urlParams.get("id");
+    if ("caches" in window) {
+      caches.match(base_url + fl_macth + idParam, token).then(function (response) {
+        if (response) {
+          response.json().then(function (data) {
+            console.log(data);
+            var no = 1;
+            var datatabel_result = "";
+            var datatabel_referees = "";
+            var matchHTML = `      
+                                <h4> <i class="Medium material-icons">flag</i>${data.match.competition.name}</h4>
+                                    <table class="centered ">
+                                        <thead>
+                                            <tr>
+                                                <th>Home Team</th>
+                                                <th>  </th>
+                                                <th>Away Team </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>${data.match.homeTeam.name}</td>
+                                                <td> VS </td>
+                                                <td>${data.match.awayTeam.name}</td>
+                                            </tr>
+                                            <tr class="card-panel black white-text">
+                                                <td> </td>
+                                                <td>SCORE</td>
+                                                <td> </td>
+                                            </tr>
+                                            <tr>
+                                                <td>${data.match.score.fullTime.homeTeam}</td>
+                                                <td>FullTime</td>
+                                                <td>${data.match.score.fullTime.awayTeam}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>${data.match.score.halfTime.homeTeam}</td>
+                                                <td>HalfTime</td>
+                                                <td>${data.match.score.halfTime.awayTeam}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>${data.match.score.extraTime.homeTeam}</td>
+                                                <td>ExtraTime</td>
+                                                <td>${data.match.score.extraTime.awayTeam}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>${data.match.score.penalties.homeTeam}</td>
+                                                <td>Penalties</td>
+                                                <td>${data.match.score.penalties.awayTeam}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>`;
+            // data result
+            datatabel_result += `                                  
+                    <tr>
+                        <td>Status</td>
+                        <td>${data.match.status}</td>
+                    </tr>
+                    <tr>
+                        <td>Match Day</td>
+                        <td>${data.match.matchday}</td>
+                    </tr>
+                    <tr>
+                        <td>Venue</td>
+                        <td>${data.match.venue}</td>
+                    </tr>
+                    <tr>
+                        <td>Winner</td>
+                        <td>${data.match.score.winner}</td>
+                    </tr>
+                    <tr>
+                        <td>Duration</td>
+                        <td>${data.match.score.duration}</td>
+                    </tr>`;
+            //data referees
+            data.match.referees.forEach(function (data_ref) {
+              datatabel_referees += `
+                            <tr>
+                                <td>${no++}</td>
+                                <td>${data_ref.name}</td>
+                            </tr>`;
+
+            });
+
+            document.getElementById("body-content").innerHTML = matchHTML;
+            document.getElementById("tabel-result").innerHTML = datatabel_result;
+            document.getElementById("tabel-referees").innerHTML = datatabel_referees;
+            // Kirim objek data hasil parsing json agar bisa disimpan ke indexed db
+            resolve(data);
+          });
+        }
+      });
+    }
+    // in online request
+    fetch(base_url + fl_macth + idParam, token)
+      .then(status)
+      .then(json)
+      .then(function (data) {
+        // Objek JavaScript dari response.json() masuk lewat variabel data.
+        console.log(data);
+        var no = 1;
+        var datatabel_result = "";
+        var datatabel_referees = "";
+        var matchHTML = `      
+                            <h4> <i class="Medium material-icons">flag</i>${data.match.competition.name}</h4>
+                                <table class="centered ">
+                                    <thead>
+                                        <tr>
+                                            <th>Home Team</th>
+                                            <th>  </th>
+                                            <th>Away Team </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>${data.match.homeTeam.name}</td>
+                                            <td> VS </td>
+                                            <td>${data.match.awayTeam.name}</td>
+                                        </tr>                                       
+                                        <tr class="card-panel black white-text">
+                                            <td> </td>
+                                            <td>SCORE</td>
+                                            <td> </td>
+                                        </tr>
+                                        <tr>
+                                            <td>${data.match.score.fullTime.homeTeam}</td>
+                                            <td>FullTime</td>
+                                            <td>${data.match.score.fullTime.awayTeam}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>${data.match.score.halfTime.homeTeam}</td>
+                                            <td>HalfTime</td>
+                                            <td>${data.match.score.halfTime.awayTeam}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>${data.match.score.extraTime.homeTeam}</td>
+                                            <td>ExtraTime</td>
+                                            <td>${data.match.score.extraTime.awayTeam}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>${data.match.score.penalties.homeTeam}</td>
+                                            <td>Penalties</td>
+                                            <td>${data.match.score.penalties.awayTeam}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>`;
+        // data result
+        datatabel_result += `                                  
+                <tr>
+                    <td>Status</td>
+                    <td>${data.match.status}</td>
+                </tr>
+                <tr>
+                    <td>Match Day</td>
+                    <td>${data.match.matchday}</td>
+                </tr>
+                <tr>
+                    <td>Venue</td>
+                    <td>${data.match.venue}</td>
+                </tr>
+                <tr>
+                    <td>Winner</td>
+                    <td>${data.match.score.winner}</td>
+                </tr>
+                <tr>
+                    <td>Duration</td>
+                    <td>${data.match.score.duration}</td>
+                </tr>`;
+        //data referees
+        data.match.referees.forEach(function (data_ref) {
+          datatabel_referees += `
+                        <tr>
+                            <td>${no++}</td>
+                            <td>${data_ref.name}</td>
+                        </tr>`;
+
+        });
+
+        document.getElementById("body-content").innerHTML = matchHTML;
+        document.getElementById("tabel-result").innerHTML = datatabel_result;
+        document.getElementById("tabel-referees").innerHTML = datatabel_referees;
+        // Kirim objek data hasil parsing json agar bisa disimpan ke indexed db
+        resolve(data);
+      });
+  });
+}
+
+function getAllComp() {
+  // jika tersimpan di chace
+  if ('caches' in window) {
+    caches.match(base_url + fl_comp).then(function (response) {
+      if (response) {
+        response.json().then(function (data) {
+          var macthHTML = "";
+          var img_liga = "";
+          data.matches.forEach(function (array_data) {
+            if (array_data.competition.name === "Primera Division") {
+              img_liga = "/images/PD.png";
+            } else if (array_data.competition.name === "Eredivisie") {
+              img_liga = "/images/ED.jpg";
+            } else if (array_data.competition.name === "Serie A") {
+              img_liga = "/images/SA.png";
+            } else if (array_data.competition.name === "Championship") {
+              img_liga = "/images/CS.png";
+            } else if (array_data.competition.name === "Premier League") {
+              img_liga = "/images/PL.png";
+            } else if (array_data.competition.name === "Bundesliga") {
+              img_liga = "/images/BL.png";
+            }
+            macthHTML += `
+                  <div class="col s12 m4">
+                  <div class="card small">
+                    <div class="card-image">
+                    <a href="./match.html?id=${array_data.id}">                            
+                            <img class="responsive-img" style="padding:10px;" src="${img_liga}" >                          
+                        </a>
+                    </div>
+                    <div class="card-content center-align">
+                    <h5 class="blue-text">${array_data.competition.name}</h5>
+                    </div>
+                  </div>
+                </div>`;
+          });
+          // Sisipkan komponen card ke dalam elemen dengan id #teams
+          document.getElementById("macth").innerHTML = macthHTML;
+        })
+      }
+    })
+  }
+
+  fetch(base_url + fl_comp, token)
+    .then(status)
+    .then(json)
+    .then(function (data) {
+      console.log(data);
+      // Objek/array JavaScript dari response.json() masuk lewat data.
+      var macthHTML = "";
+      var img_liga = "";
+      data.competitions.forEach(function (array_data) {
+        if (array_data.name === "Primera Division") {
+          img_liga = "/images/PD.png";
+        } else if (array_data.name === "Eredivisie") {
+          img_liga = "/images/ED.jpg";
+        } else if (array_data.name === "Serie A") {
+          img_liga = "/images/SA.png";
+        } else if (array_data.name === "Championship") {
+          img_liga = "/images/CS.png";
+        } else if (array_data.name === "Premier League") {
+          img_liga = "/images/PL.png";
+        } else if (array_data.name === "Bundesliga") {
+          img_liga = "/images/BL.png";
+        }
+
+        macthHTML += `
+              <div class="col s12 m4">
+              <div class="card small">
+                <div class="card-image">
+                    <a href="./match.html?id=${array_data.id}">                            
+                        <img class="responsive-img" src="${img_liga}" >                          
+                    </a>
+                </div>
+                <div class="card-content center-align">
+                <h5 class="blue-text">${array_data.name}</h5>
+                </div>
+              </div>
+            </div>`;
+
+      });
+      // Sisipkan komponen card ke dalam elemen dengan id #content
+      document.getElementById("macth").innerHTML = macthHTML;
+
+    })
+    .catch(error);
+}
+
+
+// ===================   read and get data on indeXdb  =================================
+function getSaved_Teams() {
+  getsvd_teams().then(function (teams) {
+    console.log(teams);
+    var teamsHTML = "";
+    if (teams <= 0) {
+      teamsHTML += `
+      <div class="container">
+      <div class="col s12">
+        <div class="card-panel blue">
+          <span class="white-text ">
+            <i class="tiny material-icons">info_outline</i> Belum ada Data Yang Tersimpan
+          </span>
+        </div>
+      </div>
+    </div>`;
+
+    } else {
+      teams.forEach(function (teams) {
+        teamsHTML += `
+        <div class="col s12 m4">
+        <div class="card small">
+          <div class="card-image">
+              <a href="./teams.html?id=${teams.id}&saved=true">                            
+                  <img class="responsive-img" style="padding:10px;" src="${teams.crestUrl}" >                          
+              </a>
+          </div>
+          <div class="card-content center-align">
+          <h5 class="blue-text">${teams.name}</h5>
+          </div>
+        </div>
+      </div>`;
+      });
+
+    }
+    // Sisipkan komponen card ke dalam elemen dengan id #body-content
+    document.getElementById("team-svd").innerHTML = teamsHTML;
+  });
+}
+
+// get detail yang di simpan di indexed DB
+function getsvd_teamsByid() {
+  var urlParams = new URLSearchParams(window.location.search);
+  var idParam = urlParams.get("id");
+
+  getById_tmSVD(idParam).then(function (teams) {
+    console.log(teams);
+    var datatabel_comp = "";
+    var datatabel_play = "";
+    var no_play = 1;
+    var no_comp = 1;
+    var articleHTML = `      
+                            <div class="card-image waves-effect waves-block waves-light">
+                              <img class="responsive-img" style="padding:10px;" src="${teams.crestUrl}" />
+                            </div>
+                            <div class="card-content">
+                            <h4> <i class="Medium material-icons">flag</i>${teams.name}</h4>
+                                <table >
+                                    <thead>
+                                        <tr>
+                                            <th>Info</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Club Name</td>
+                                            <td>${teams.name}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Club Color</td>
+                                            <td>${teams.clubColors}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Venue </td>
+                                            <td>${teams.venue}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Founded</td>
+                                            <td>${teams.founded}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Address</td>
+                                            <td>${teams.address}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Phone</td>
+                                            <td>${teams.phone}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Website</td>
+                                            <td>${teams.website}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Email</td>
+                                            <td>${teams.email}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>`;
+    // data compotitions
+    teams.activeCompetitions.forEach(function (data_comp) {
+      datatabel_comp += `
+              <tr>
+                  <td>${no_comp++}</td>
+                  <td>${data_comp.name}</td>
+                  <td>${data_comp.code}</td>
+                  <td>${data_comp.plan}</td>
+              </tr>`;
+
+    });
+    //data player squad
+    teams.squad.forEach(function (data_squad) {
+      datatabel_play += `
+              <tr>
+                  <td>${no_play++}</td>
+                  <td>${data_squad.name}</td>
+                  <td>${data_squad.position}</td>
+              </tr>`;
+
+    });
+
+    document.getElementById("body-content").innerHTML = articleHTML;
+    document.getElementById("tabel-comp").innerHTML = datatabel_comp;
+    document.getElementById("tabel-player").innerHTML = datatabel_play;
+
+  });
+}

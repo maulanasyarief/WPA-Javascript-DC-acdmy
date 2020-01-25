@@ -1,0 +1,115 @@
+	const CACHE_NAME = "Cache_readapi_football";
+	var urlsToCache = [
+		"/",
+		"/images/logo_app.ico",
+		"/images/logo_app.png",
+		"/images/img_null.jpg",
+		"/images/images.png",
+		"/images/comps/BL1.png",
+		"/images/comps/BSA.png",
+		"/images/comps/CL.png",
+		"/images/comps/DED.png",
+		"/images/comps/EC.png",
+		"/images/comps/ELC.png",
+		"/images/comps/FL1.png",
+		"/images/comps/PD.png",
+		"/images/comps/PL.png",
+		"/images/comps/PPL.png",
+		"/images/comps/SA.png",
+		"/images/comps/WC.png",
+		"/css/materialize.min.css",
+		"/js/jquery-2.1.1.min.js",
+		"/js/materialize.min.js",
+		"/js/menu.js",
+		"/js/api.js",
+		"/menu.html",
+		"/index.html",
+		"/competitions.html",
+		"/teams.html",
+		"/standingId.html",
+		"/pages/home.html",
+		"/pages/standing.html",
+		"/pages/saved_comp.html",
+		"/pages/saved_team.html"
+
+	];
+
+	self.addEventListener("install", function (event) {
+		event.waitUntil(
+			caches.open(CACHE_NAME).then(function (cache) {
+				return cache.addAll(urlsToCache);
+			})
+		);
+	});
+
+
+	self.addEventListener("fetch", function (event) {
+		var base_url = "http://api.football-data.org/v2/";
+		if (event.request.url.indexOf(base_url) > -1) {
+			event.respondWith(
+				caches.open(CACHE_NAME).then(function (cache) {
+					return fetch(event.request).then(function (response) {
+						cache.put(event.request.url, response.clone());
+						return response;
+					})
+				})
+			);
+
+			/* jika ada id nya error, tanpa (ignoreSearch)
+			  } else {
+			    event.respondWith(
+			      caches.match(event.request).then(function(response) {
+			        return response || fetch (event.request);
+			      })
+			    )
+			  }
+			*/
+
+			//+ { ignoreSearch: true })
+		} else {
+			event.respondWith(
+				caches.match(event.request, {
+					ignoreSearch: true
+				}).then(function (response) {
+					return response || fetch(event.request);
+				})
+			)
+		}
+	});
+
+	self.addEventListener("activate", function (event) {
+		event.waitUntil(
+			caches.keys().then(function (cacheNames) {
+				return Promise.all(
+					cacheNames.map(function (cacheName) {
+						if (cacheName != CACHE_NAME) {
+							console.log("ServiceWorker: cache " + cacheName + " dihapus");
+							return caches.delete(cacheName);
+						}
+					})
+				);
+			})
+		);
+	});
+
+	// ================ functions phusnotifications
+	self.addEventListener('push', function (event) {
+		var body;
+		if (event.data) {
+			body = event.data.text();
+		} else {
+			body = 'Push message no payload';
+		}
+		var options = {
+			body: body,
+			icon: 'images/images.png',
+			vibrate: [100, 50, 100],
+			data: {
+				dateOfArrival: Date.now(),
+				primaryKey: 1
+			}
+		};
+		event.waitUntil(
+			self.registration.showNotification('Push Notification', options)
+		);
+	});

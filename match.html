@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Footbal info</title>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#000" />
+    <meta name="description" content="Football info liga" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="css/materialize.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+
+<body>
+
+    <!-- Navigasi -->
+    <nav class="black lighten-1" role="navigation">
+        <div class="nav-wrapper container">
+            <a href="#" class="brand-logo" id="logo-container">Macth Info</a>
+            <a id="btn-back" href="./index.html" class="sidenav-trigger" data-target="nav-mobile">
+                <i class="material-icons">arrow_back</i>
+            </a>
+            <ul class="topnav right hide-on-med-and-down"></ul>
+            <ul class="sidenav" id="nav-mobile"></ul>
+        </div>
+    </nav>
+    <!-- Akhir Navigasi -->
+
+    <div class="container">
+        <div class="card-panel" id="body-content">
+
+        </div>
+
+        <div class="card-panel">
+            <h5><i class="small material-icons">multiline_chart</i> Result Macth</h5>
+            <table class="">
+                <thead>
+                </thead>
+                <tbody id="tabel-result">
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card-panel">
+            <h5><i class="small material-icons">flag</i>Referees Match</h5>
+            <table class="">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Name</th>
+                    </tr>
+                </thead>
+                <tbody id="tabel-referees">
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <div class="fixed-action-btn">
+        <a class="btn-floating btn-large red" id="save-btn">
+            <i class="large material-icons">favorite_border</i>
+        </a>
+    </div>
+
+    <div class="fixed-action-btn">
+        <a class="btn-floating btn-large red" id="delet-btn" style="display: none;">
+            <i class="large material-icons">delete</i>
+        </a>
+    </div>
+
+    <script type="text/javascript" src="https://unpkg.com/snarkdown@1.0.2/dist/snarkdown.umd.js"></script>
+    <script src="js/materialize.min.js"></script>
+    <script src="js/idb.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/db.js"></script>
+
+    <script>
+        // REGISTER SERVICE WORKER
+        if ("serviceWorker" in navigator) {
+            window.addEventListener("load", function () {
+                navigator.serviceWorker
+                    .register("/service-worker.js")
+                    .then(function () {
+                        console.log("Pendaftaran ServiceWorker berhasil");
+                    })
+                    .catch(function () {
+                        console.log("Pendaftaran ServiceWorker gagal");
+                    });
+            });
+        } else {
+            console.log("ServiceWorker belum didukung browser ini.");
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            var urlParams = new URLSearchParams(window.location.search);
+            var isFromSaved = urlParams.get("saved"); // untuk cek apa dari api/database indexedDB
+            var id = urlParams.get("id");
+            var btnSave = document.getElementById("save-btn");
+            var btnDelet = document.getElementById("delet-btn");
+            var btnBack = document.getElementById("btn-back");
+
+            var item = getMatchById();
+
+            btnSave.onclick = function () {
+                console.log("Tombol saved di klik.");
+                item.then(function (match) {
+                    addToFavorite_match(match);
+                });
+            };
+
+        });
+    </script>
+
+</body>
+
+</html>
