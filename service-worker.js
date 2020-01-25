@@ -1,5 +1,5 @@
 importScripts('https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js');
-var base_url = 'http://api.football-data.org/v2/';
+var base_url = "http://api.football-data.org/v2/";
 
 if (workbox)
 	console.log(`Workbox berhasil dimuat`);
