@@ -147,7 +147,8 @@ workbox.routing.registerRoute(
 //cache rest API
 /*
 workbox.routing.registerRoute(
-	new RegExp(base_url),
+	//new RegExp(base_url),
+	new RegExp("http://api.football-data.org/v2/"),
 	workbox.strategies.staleWhileRevalidate({
 		cacheName: 'API_fottball_org'
 	})
