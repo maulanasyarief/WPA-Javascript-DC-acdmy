@@ -3,7 +3,7 @@ var token = {
     'X-Auth-Token': '6434dbc29f2a4d51888aea3a68e33431'
   }
 };
-var base_url = "http://api.football-data.org/v2/";
+var base_url = "https://api.football-data.org/v2/";
 var comp = "competitions/";
 var fltr_comp = "?plan=TIER_ONE"
 var fl_teams = "teams/";
