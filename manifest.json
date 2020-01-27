@@ -10,6 +10,10 @@
 			"src": "/images/logo_app.png",
 			"sizes": "512x512",
 			"type": "image/png"
+		}, {
+			"src": "/images/apel_icon.png",
+			"sizes": "192x192",
+			"type": "image/png"
 		}],
 		"gcm_sender_id": "573976425451"
 	}

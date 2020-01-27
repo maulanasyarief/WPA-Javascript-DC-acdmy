@@ -1,11 +1,30 @@
-<div class="container">
-    <div class="card-panel" id="comp-name">
-
+<div id="anim-loding" class="container col s12">
+    <div class="card-panel  center-align">
+        <div class="preloader-wrapper small active">
+            <div class="spinner-layer spinner-yellow-only">
+                <div class="circle-clipper left">
+                    <div class="circle"></div>
+                </div>
+                <div class="gap-patch">
+                    <div class="circle"></div>
+                </div>
+                <div class="circle-clipper right">
+                    <div class="circle"></div>
+                </div>
+            </div>
+        </div></br>
+        <span class="black-text ">
+            Load data...
+        </span>
     </div>
+</div>
 
+<div class="container" id="body-tabel" style="display: none;">
+    <div class="card-panel" id="comp-name">
+    </div>
     <div class="card-panel grey darken-4 white-text">
         <table class="centered responsive-table">
-            <thead>
+            <thead id="tabel-head">
                 <tr>
                     <th>Position</th>
                     <th>Club</th>

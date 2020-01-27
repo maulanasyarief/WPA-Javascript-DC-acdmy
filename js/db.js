@@ -23,7 +23,7 @@ function addToFavorite(teams) {
             var tx = db.transaction("teams", "readwrite");
             var store = tx.objectStore("teams");
             console.log(teams);
-            store.add(teams);
+            store.put(teams);
             return tx.complete;
         })
         .then(function () {
@@ -47,7 +47,7 @@ function addToFavorite_match(match) {
             var tx = db.transaction("match", "readwrite");
             var store = tx.objectStore("match");
             console.log(match);
-            store.add(match.match);
+            store.put(match.match);
             return tx.complete;
         })
         .then(function () {
@@ -71,7 +71,7 @@ function addToFavorite_comp(competitions) {
             var tx = db.transaction("competitions", "readwrite");
             var store = tx.objectStore("competitions");
             console.log(competitions);
-            store.add(competitions);
+            store.put(competitions);
             return tx.complete;
         })
         .then(function () {
@@ -120,6 +120,21 @@ function getById_tmSVD(id) {
     });
 }
 
+function getIdtmSVD(id) {
+    var id_tm = parseInt(id);
+    return new Promise(function (resolve, reject) {
+        dbPromised
+            .then(function (db) {
+                var tx = db.transaction("teams", "readonly");
+                var store = tx.objectStore("teams");
+                return store.get(id_tm);
+            })
+            .then(function (id) {
+                resolve(id);
+            });
+    });
+}
+
 function delete_tmSVD(teams) {
     var id_tm = parseInt(teams);
     dbPromised
@@ -135,6 +150,7 @@ function delete_tmSVD(teams) {
                 html: ' Di hapus dari Favorite',
                 classes: 'rounded'
             });
+            window.location = "/#saved_team";
         }).catch(error => {
             M.toast({
                 html: ' Gagal di Hapus',
@@ -190,6 +206,7 @@ function delete_cmSVD(competitions) {
                 html: ' Di hapus dari Favorite',
                 classes: 'rounded'
             });
+            window.location = "/#saved_comp";
         }).catch(error => {
             M.toast({
                 html: ' Gagal di Hapus',

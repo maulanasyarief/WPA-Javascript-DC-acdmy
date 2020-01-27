@@ -51,7 +51,6 @@
          // tambahkan blok if berikut untuk panggil getSavedArticles() dari IndexedDB
          if (page === "home") {
            getAllTeams();
-           //getAllMatch();
            getAllComp();
            titel.innerHTML = "Football info";
            tabmenu.style.display = 'block';

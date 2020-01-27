@@ -1,5 +1,5 @@
 importScripts('https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js');
-var base_url = "http://api.football-data.org/v2/";
+var base_url = "https://api.football-data.org/v2/";
 
 if (workbox)
 	console.log(`Workbox berhasil dimuat`);
@@ -8,10 +8,18 @@ else
 
 //note setiap konten app shell di ubah revision: '1' juga di update
 workbox.precaching.precacheAndRoute([{
-		url: '/css/materialize.min.css',
+		url: '/manifest.json',
 		revision: '1'
 	}, {
+		url: '/css/materialize.min.css',
+		revision: '1'
+	},
+	{
 		url: '/js/idb.js',
+		revision: '1'
+	},
+	{
+		url: '/js/home.js',
 		revision: '1'
 	},
 	{
@@ -72,6 +80,9 @@ workbox.precaching.precacheAndRoute([{
 	},
 	{
 		url: '/images/logo_app.ico',
+		revision: '1'
+	}, {
+		url: '/images/apel_icon.png',
 		revision: '1'
 	}, {
 		url: '/images/logo_app.png',
@@ -144,16 +155,6 @@ workbox.routing.registerRoute(
 	})
 );
 
-//cache rest API
-/*
-workbox.routing.registerRoute(
-	//new RegExp(base_url),
-	new RegExp("http://api.football-data.org/v2/"),
-	workbox.strategies.staleWhileRevalidate({
-		cacheName: 'API_fottball_org'
-	})
-);
-*/
 workbox.routing.registerRoute(
 	new RegExp(base_url),
 	workbox.strategies.networkFirst({
@@ -167,7 +168,6 @@ workbox.routing.registerRoute(
 		],
 	})
 );
-
 
 
 // ================ functions phusnotifications

@@ -5,6 +5,7 @@
     <meta charset="UTF-8" />
     <title>Footbal info</title>
     <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" href="/apel_icon.png" />
     <link rel="shortcut icon" href="/images/logo_app.ico" />
     <meta name="theme-color" content="#000" />
     <meta name="description" content="Football info liga" />
@@ -29,48 +30,84 @@
     <!-- Akhir Navigasi -->
 
     <div class="container">
-        <div class="card" id="body-content">
+        <div class="card-panel yellow center-align" id="cek-fav" style="display: none;">
+            <span class="black-text ">
+                Telah ditambahkan Ke favorite
+            </span>
+        </div>
+        <div class="card-panel red center-align" id="data-empty" style="display: none;">
+            <span class="white-text ">
+                Data tidak di temukan
+            </span>
         </div>
 
-        <div class="card">
-            <div class="card-content">
-                <span class="card-title center-align">Compotitions</span>
-                <table class="striped">
-                    <thead>
-                        <tr>
-                            <th>No</th>
-                            <th>League</th>
-                            <th></th>
-                            <th>Plan</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tabel-comp">
-                    </tbody>
-                </table>
-                <span class="card-title center-align">Player</span>
-                <table class="striped">
-                    <thead>
-                        <tr>
-                            <th>No</th>
-                            <th>Name</th>
-                            <th>Positions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tabel-player">
-                    </tbody>
-                </table>
+
+        <div id="anim-loding" class="col s12">
+            <div class="card-panel  center-align">
+                <div class="preloader-wrapper small active">
+                    <div class="spinner-layer spinner-yellow-only">
+                        <div class="circle-clipper left">
+                            <div class="circle"></div>
+                        </div>
+                        <div class="gap-patch">
+                            <div class="circle"></div>
+                        </div>
+                        <div class="circle-clipper right">
+                            <div class="circle"></div>
+                        </div>
+                    </div>
+                </div></br>
+                <span class="black-text ">
+                    Load data...
+                </span>
             </div>
         </div>
+
+        <div class="card" id="body-tabel" style="display: none;">
+            <div id="body-content">
+
+            </div>
+            <div class="card">
+                <div class="card-content">
+                    <span class="card-title center-align">Compotitions</span>
+                    <table class="striped">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>League</th>
+                                <th></th>
+                                <th>Plan</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabel-comp">
+                        </tbody>
+                    </table>
+                    <span class="card-title center-align">Player</span>
+                    <table class="striped">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Name</th>
+                                <th>Positions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabel-player">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <div class="fixed-action-btn">
-        <a class="btn-floating btn-large red" id="save-btn" style="display: none;">
+        <a class="btn-floating btn-large black" id="save-btn" style="display: none;">
             <i class="large material-icons">favorite_border</i>
         </a>
     </div>
 
     <div class="fixed-action-btn">
-        <a class="btn-floating btn-large red" id="delet-btn" style="display: none;">
+        <a class="btn-floating btn-large black" id="delet-btn" style="display: none;">
             <i class="large material-icons">delete</i>
         </a>
     </div>
@@ -102,15 +139,17 @@
             var urlParams = new URLSearchParams(window.location.search);
             var isFromSaved = urlParams.get("saved"); // untuk cek apa dari api/database indexedDB
             var id = urlParams.get("id");
+            var cekFav = document.getElementById("cek-fav");
             var btnSave = document.getElementById("save-btn");
             var btnDelet = document.getElementById("delet-btn");
             var btnBack = document.getElementById("btn-back");
             var titel = document.getElementById("tag-head");
 
             titel.innerHTML = "Team";
+
+
             if (isFromSaved) {
                 // Hide fab jika dimuat dari indexed db
-
                 btnSave.style.display = 'none';
                 btnDelet.style.display = 'block';
                 btnBack.setAttribute('href', "./#saved_team");
@@ -120,18 +159,22 @@
                 btnSave.style.display = 'block';
                 var item = getTeamsById();
             }
+
             btnSave.onclick = function () {
                 console.log("Tombol saved di klik.");
                 item.then(function (teams) {
                     addToFavorite(teams);
                 });
+                btnSave.style.display = 'none';
+                btnDelet.style.display = 'block';
+                cekFav.style.display = 'block';
             };
 
             btnDelet.onclick = function () {
                 console.log("Tombol Delet di klik." + id);
-
                 delete_tmSVD(id);
-
+                btnDelet.style.display = 'none';
+                cekFav.style.display = 'none';
             };
 
         });

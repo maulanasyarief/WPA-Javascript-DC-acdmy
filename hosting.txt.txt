@@ -1,0 +1,17 @@
+= guthub https://github.com/maulanasyarief/maulanasyarief.github.io
+
+= maulanasyarief.github.io
+
+padahal seblm di upload jalan dengan benar
+
+error
+api.js:75 Mixed Content: The page at 'https://maulanasyarief.github.io/' 
+was loaded over HTTPS, but requested an insecure resource 'http://api.football-data.org/v2/teams/'.
+ This request has been blocked; the content must be served over
+ HTTPS.
+getAllTeams @ api.js:75
+xhttp.onreadystatechange @ menu.js:53
+XMLHttpRequest.send (async)
+loadPage @ menu.js:84
+(anonymous) @ menu.js:42
+api.js:563 Mixed Content: The page at 'https://maulanasyarief.github.io/' was loaded over HTTPS, but requested an insecure resource 'http://api.football-data.org/v2/competitions/?plan=TIER_ONE'. This request has been blocked; the content must be served over HTTPS.
